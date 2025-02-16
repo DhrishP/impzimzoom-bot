@@ -590,7 +590,10 @@ async function handleTelegramUpdate(update: TelegramUpdate, env: Env) {
 const pendingEncryption = new Map();
 const pendingDecryption = new Map();
 
-// Webhook handler
+app.get("/", (req, res) => {
+  res.status(200).send("Bot is running!");
+});
+
 app.post("/webhook", async (req, res) => {
   try {
     const update = req.body as Update;
@@ -606,15 +609,12 @@ app.post("/webhook", async (req, res) => {
   }
 });
 
-// Health check endpoint
-app.get("/", (req, res) => {
-  res.status(200).send("Bot is running!");
-});
-
 // Handle 404
 app.use((req, res) => {
   res.status(404).send("Not Found");
 });
 
-// Export the Express API
-export default app;
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
