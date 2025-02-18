@@ -543,7 +543,7 @@ async function handleTelegramUpdate(update: TelegramUpdate, env: Env) {
         ? "SELECT title, content, created_at FROM contexts WHERE chat_id = ? AND user_id = ?"
         : "SELECT title, created_at FROM contexts WHERE chat_id = ? AND user_id = ?";
 
-      let params = [chatId.toString(), userId];
+      let params = [chatId.toString(), userId.toString()];
 
       if (titleFilter) {
         query += " AND title LIKE ?";
