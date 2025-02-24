@@ -234,6 +234,7 @@ async function findSimilarContexts(
     contexts.embedding,
     embedding
   )})`;
+  console.log(similarity);
 
   return await db
     .select({
@@ -512,10 +513,8 @@ async function handleTelegramUpdate(update: TelegramUpdate, env: Env) {
   if (text.startsWith("/getcontext ")) {
     const prompt = text.slice(11);
     try {
-      // Generate embedding for the query
       const queryEmbedding = await generateEmbedding(prompt, env);
-
-      // Find similar contexts
+      console.log(queryEmbedding);
       const similarContexts = await findSimilarContexts(
         queryEmbedding,
         userId.toString(),
