@@ -230,11 +230,10 @@ async function findSimilarContexts(
   userId: string,
   chatId: string
 ) {
-  const similarity = sql<number>`1 - ${cosineDistance(
+  const similarity = sql<number>`1 - (${cosineDistance(
     contexts.embedding,
     embedding
-  )}`;
-  console.log(similarity.queryChunks, "similarity");
+  )})`;
 
   return await db
     .select({
