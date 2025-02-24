@@ -230,13 +230,12 @@ async function findSimilarContexts(
   userId: string,
   chatId: string
 ) {
-  const similarity = sql<number>`1 - (${cosineDistance(
+  const similarity = sql<number>`1 - ${cosineDistance(
     contexts.embedding,
     embedding
-  )})`;
-  console.log(similarity);
+  )}`;
 
-  return await db
+  const results = await db
     .select({
       title: contexts.title,
       content: contexts.content,
@@ -252,6 +251,13 @@ async function findSimilarContexts(
     )
     .orderBy(desc(similarity))
     .limit(5);
+
+  console.log(
+    "Similarities:",
+    results.map((r) => r.similarity)
+  );
+
+  return results;
 }
 
 // Handle Telegram webhook updates
