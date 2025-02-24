@@ -230,12 +230,10 @@ async function findSimilarContexts(
   userId: string,
   chatId: string
 ) {
-  const similarity = sql<number>`1 - (embedding <=> array[${sql.raw(
-    embedding.toString()
-  )}]::vector)`;
-  console.log(similarity.queryChunks, "similarity");
+    const similarity = sql<number>`1 - ${cosineDistance(contexts.embedding, embedding)}`;
+    console.log(similarity)
 
-  const results = await db
+  return await db
     .select({
       title: contexts.title,
       content: contexts.content,
@@ -251,12 +249,6 @@ async function findSimilarContexts(
     )
     .orderBy(desc(similarity))
     .limit(5);
-
-  console.log(
-    "Similarities:",
-    results.map((r) => Number(r.similarity))
-  );
-  return results;
 }
 
 // Handle Telegram webhook updates
@@ -518,8 +510,10 @@ async function handleTelegramUpdate(update: TelegramUpdate, env: Env) {
   if (text.startsWith("/getcontext ")) {
     const prompt = text.slice(11);
     try {
+      // Generate embedding for the query
       const queryEmbedding = await generateEmbedding(prompt, env);
-      console.log(queryEmbedding);
+
+      // Find similar contexts
       const similarContexts = await findSimilarContexts(
         queryEmbedding,
         userId.toString(),
