@@ -230,10 +230,9 @@ async function findSimilarContexts(
   userId: string,
   chatId: string
 ) {
-  const similarity = sql<number>`1 - (embedding <=> ${sql.raw(
+  const similarity = sql<number>`1 - (embedding <=> array[${sql.raw(
     embedding.toString()
-  )})`;
-  console.log(similarity, "similarity");
+  )}]::vector)`;
 
   const results = await db
     .select({
