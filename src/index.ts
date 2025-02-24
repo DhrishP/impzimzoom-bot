@@ -234,6 +234,11 @@ async function findSimilarContexts(
     contexts.embedding,
     embedding
   )})`;
+  console.log(
+    similarity,
+    similarity.queryChunks,
+    "lessgo"
+  );
 
   return await db
     .select({
