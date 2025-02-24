@@ -233,6 +233,7 @@ async function findSimilarContexts(
   const similarity = sql<number>`1 - (embedding <=> ${sql.raw(
     embedding.toString()
   )})`;
+  console.log(similarity, "similarity");
 
   const results = await db
     .select({
