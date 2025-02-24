@@ -233,6 +233,7 @@ async function findSimilarContexts(
   const similarity = sql<number>`1 - (embedding <=> array[${sql.raw(
     embedding.toString()
   )}]::vector)`;
+  console.log(similarity.queryChunks, "similarity");
 
   const results = await db
     .select({
