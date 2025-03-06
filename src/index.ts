@@ -212,7 +212,7 @@ async function generateEmbedding(text: string, env: Env): Promise<number[]> {
     body: JSON.stringify({
       input: text,
       model: "voyage-3",
-      input_type: "document",
+      input_type: "text",
     }),
   });
 
@@ -230,31 +230,33 @@ async function findSimilarContexts(
   userId: string,
   chatId: string
 ) {
-  const results = await db.execute<{
-    title: string;
-    content: string;
-    similarity: number;
-  }>(
-    sql`
-    SELECT title, content, 1 - (embedding <-> array[${sql.raw(
-      embedding.toString()
-    )}]::vector) as similarity 
-    FROM contexts 
-    WHERE user_id = ${userId} 
-    AND chat_id = ${chatId}
-    AND 1 - (embedding <-> array[${sql.raw(
-      embedding.toString()
-    )}]::vector) > 0.7
-    ORDER BY similarity DESC 
-    LIMIT 5
-  `
-  );
+  const similarity = sql<number>`1 - (${cosineDistance(
+    contexts.embedding,
+    embedding
+  )})`;
+
+  const results = await db
+    .select({
+      title: contexts.title,
+      content: contexts.content,
+      similarity: similarity,
+    })
+    .from(contexts)
+    .where(
+      and(
+        eq(contexts.userId, userId),
+        eq(contexts.chatId, chatId),
+        gt(similarity, 0.5)
+      )
+    )
+    .orderBy(desc(similarity))
+    .limit(4);
 
   console.log(
     "Similarities:",
-    results.rows.map((r) => r.similarity)
+    results.map((r) => r.similarity)
   );
-  return results.rows;
+  return results;
 }
 
 // Handle Telegram webhook updates
