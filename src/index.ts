@@ -408,19 +408,19 @@ async function handleTelegramUpdate(update: TelegramUpdate, env: Env) {
       return;
     }
 
+    // Store the credential info for decryption
+    pendingDecryption.set(`${chatId}-${userId}`, {
+      credId: cred.id,
+      encryptedPassword: cred.encryptedPassword,
+      timestamp: Date.now(),
+    });
+
     await sendTelegramMessage(
       chatId,
       "🔑 Please provide the decryption key:",
       env,
       5000
     );
-    await db.insert(credentials).values({
-      chatId: chatId.toString(),
-      userId: userId.toString(),
-      title: cred.title,
-      username: cred.username,
-      encryptedPassword: cred.encryptedPassword,
-    });
     return;
   }
 
